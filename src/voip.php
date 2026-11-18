@@ -54,8 +54,7 @@ class voip
             </mainbody>";
         $ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,'https://api.netgsm.com.tr/voice/report');
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,2);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+		$this->applyTls($ch);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: text/xml"));
 		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
@@ -124,8 +123,7 @@ class voip
 
          $ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,"https://api.netgsm.com.tr/voicesms/receive");
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,2);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,0);
+		$this->applyTls($ch);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type: text/xml"));
 		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
@@ -165,5 +163,26 @@ class voip
             
         return $res;
        
+    }
+
+    /**
+     * TLS sertifika doğrulamasını açar (MITM koruması).
+     * CA kaynağı sırasıyla: NETGSM_CA_PATH ortam değişkeni (dosya veya dizin),
+     * sistem CA deposu, sistemde yoksa composer/ca-bundle ile gelen CA dosyası.
+     */
+    private function applyTls($ch): void
+    {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+
+        $ca = null;
+        if (!empty($_ENV['NETGSM_CA_PATH'])) {
+            $ca = $_ENV['NETGSM_CA_PATH'];
+        } elseif (class_exists('\Composer\CaBundle\CaBundle')) {
+            $ca = \Composer\CaBundle\CaBundle::getSystemCaRootBundlePath();
+        }
+        if ($ca !== null) {
+            curl_setopt($ch, is_dir($ca) ? CURLOPT_CAPATH : CURLOPT_CAINFO, $ca);
+        }
     }
 }

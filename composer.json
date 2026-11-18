@@ -16,6 +16,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=7.2.5"
+        "php": ">=7.2.5",
+        "composer/ca-bundle": "^1.3"
     }
 }

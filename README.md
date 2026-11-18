@@ -49,6 +49,18 @@ PHP 7.2.5 ve üzeri
 <b>NETGSM_USERCODE=""</b>  
 <b>NETGSM_PASSWORD=""</b>  
 
+### SSL / TLS Sertifika Doğrulaması
+
+v2.0.2 sürümüyle birlikte tüm istekler TLS sertifika doğrulaması açık olarak yapılır (`CURLOPT_SSL_VERIFYPEER=true`, `CURLOPT_SSL_VERIFYHOST=2`). Ek bir ayar gerekmez: sunucunuzda CA sertifika deposu tanımlı değilse (ör. XAMPP/WAMP), paketle birlikte gelen `composer/ca-bundle` kullanılır.
+
+Kurumsal ağınızda TLS denetimi yapan bir proxy varsa, proxy'nin CA sertifikasını `.env` dosyanızda belirtin (dosya veya dizin):
+
+```
+NETGSM_CA_PATH=/yol/kurumsal-ca.pem
+```
+
+`cURL error 60` veya `77` alırsanız `NETGSM_CA_PATH` değerini ve dosyanın okunabilir olduğunu kontrol edin. Sertifika doğrulamasını kapatmayın; kapatmak kullanıcı adı ve şifrenizi ortadaki adam (MITM) saldırılarına açık hale getirir.
+
 ### Görüşme Detayı
 
 Gelen ve giden aramalarınızı bu servisi kullanarak sorgulayabilirsiniz.
